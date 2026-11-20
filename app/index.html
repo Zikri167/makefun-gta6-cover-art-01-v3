@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Neon Shores Cover Studio — multi-panel cover art maker</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="topbar">
+  <div class="brand">
+    <span class="brand-mark">NS</span>
+    <div class="brand-text">
+      <strong>Neon Shores Cover Studio</strong>
+      <span>Multi-panel poster covers from your own photos — offline, nothing uploads.</span>
+    </div>
+  </div>
+  <div class="top-actions">
+    <button id="undoBtn" type="button" title="Undo (Ctrl+Z)">&#8630; Undo</button>
+    <button id="redoBtn" type="button" title="Redo (Ctrl+Y)">&#8631; Redo</button>
+    <button id="exportAllBtn" type="button" class="primary">Export all 3 sizes</button>
+  </div>
+</header>
+
+<main id="workspace">
+  <section id="stageWrap">
+    <canvas id="stage" width="960" height="540"></canvas>
+    <p id="stageHint">Click a panel on the cover to select it, then shape it with the panel controls. Arm the erase brush and drag on the cover to clean the hero cut-out.</p>
+  </section>
+
+  <aside id="controls">
+    <fieldset>
+      <legend>Canvas</legend>
+      <label class="row"><span>Layout</span>
+        <select id="layoutSelect"></select>
+      </label>
+      <div class="row"><span>Post size</span>
+        <div class="seg" id="sizeSeg">
+          <button type="button" data-size="landscape">1920×1080</button>
+          <button type="button" data-size="portrait">1080×1350</button>
+          <button type="button" data-size="square">1080×1080</button>
+        </div>
+      </div>
+      <label class="row"><span>Colour grade</span>
+        <select id="gradeSelect"></select>
+      </label>
+      <label class="row"><span>Grade strength</span>
+        <input id="gradeAmount" type="range" min="0" max="100" value="85">
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Lettering &amp; badges</legend>
+      <label class="row"><span>Title</span>
+        <input id="titleInput" type="text" maxlength="24" value="NEON SHORES">
+      </label>
+      <label class="row"><span>Subtitle</span>
+        <input id="subtitleInput" type="text" maxlength="28" value="Sunset Heist">
+      </label>
+      <label class="row"><span>Callout</span>
+        <input id="calloutInput" type="text" maxlength="24" value="ONE LAST SCORE">
+      </label>
+      <label class="row"><span>Heat <b id="heatVal">5</b>&#9733;</span>
+        <input id="heatRange" type="range" min="0" max="5" step="1" value="5">
+      </label>
+      <label class="row"><span>Badge ribbon</span>
+        <input id="badgeInput" type="text" maxlength="16" value="WANTED">
+      </label>
+      <label class="row"><span>Corner badge</span>
+        <input id="badge2Input" type="text" maxlength="16" value="HEAT LEVEL 5">
+      </label>
+      <label class="row"><span>Role tag</span>
+        <input id="roleInput" type="text" maxlength="14" value="DRIVER">
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Photos</legend>
+      <label class="row file-row"><span>Your photos</span>
+        <input id="photoFile" type="file" accept="image/*" multiple>
+      </label>
+      <div id="photoStrip"></div>
+      <p class="note">Pick a photo, then click a panel to fill it — or press “Make hero” to cut the picked photo out as the pop-out star.</p>
+    </fieldset>
+
+    <fieldset>
+      <legend>Selected panel — <b id="panelName">none</b></legend>
+      <label class="row"><span>Fill</span>
+        <select id="fillSelect">
+          <option value="photo">Photo</option>
+          <option value="scene-sky">Vice sky scene</option>
+          <option value="scene-neon">Neon street scene</option>
+          <option value="scene-sunset">Sunset gradient</option>
+        </select>
+      </label>
+      <label class="row"><span>Zoom</span>
+        <input id="zoomRange" type="range" min="100" max="300" value="100">
+      </label>
+      <label class="row"><span>Shift X</span>
+        <input id="oxRange" type="range" min="0" max="100" value="50">
+      </label>
+      <label class="row"><span>Shift Y</span>
+        <input id="oyRange" type="range" min="0" max="100" value="50">
+      </label>
+      <label class="row"><span>Tilt</span>
+        <input id="tiltRange" type="range" min="-8" max="8" step="0.5" value="0">
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Hero pop-out</legend>
+      <label class="row check"><span>Show pop-out hero</span>
+        <input id="heroEnable" type="checkbox" checked>
+      </label>
+      <div class="row"><span>Hero photo</span>
+        <button id="heroPhotoBtn" type="button">Use picked photo as hero</button>
+      </div>
+      <label class="row"><span>Cut-out style</span>
+        <select id="heroMode">
+          <option value="chroma">Colour key (clean edges)</option>
+          <option value="silhouette">Inked silhouette</option>
+        </select>
+      </label>
+      <label class="row"><span>Key tolerance</span>
+        <input id="tolRange" type="range" min="10" max="110" value="34">
+      </label>
+      <label class="row"><span>Edge feather</span>
+        <input id="featherRange" type="range" min="0" max="8" step="0.5" value="2.5">
+      </label>
+      <label class="row check"><span>Erase brush armed</span>
+        <input id="brushToggle" type="checkbox">
+      </label>
+      <label class="row"><span>Brush size</span>
+        <input id="brushSize" type="range" min="8" max="120" value="44">
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Export PNG</legend>
+      <div class="export-grid">
+        <button type="button" data-export="landscape">1920×1080 cover</button>
+        <button type="button" data-export="portrait">1080×1350 cover</button>
+        <button type="button" data-export="square">1080×1080 cover</button>
+      </div>
+      <p class="note">Exports render the full composition — panels, pop-out hero, chrome title, badges, grain — at full resolution, in one click.</p>
+    </fieldset>
+  </aside>
+</main>
+
+<div id="shotStage" hidden></div>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
